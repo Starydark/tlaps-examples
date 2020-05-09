@@ -128,7 +128,42 @@ THEOREM ShowsSafety ==
 THEOREM SafeAtStable == Inv /\ Next /\ TypeOK' =>
                             \A b \in Ballot, v \in Value :
                                 SafeAt(b, v) => SafeAt(b, v)'
-  OMITTED                                
+<1> USE DEFS Inv
+<1> SUFFICES ASSUME Inv, Next, TypeOK',
+                    NEW v \in Value, NEW b \in Ballot, SafeAt(b, v)
+             PROVE  SafeAt(b, v)'
+  OBVIOUS
+<1>1. ASSUME NEW aa \in Acceptor, NEW bb \in Ballot, IncreaseMaxBal(aa, bb)
+      PROVE  SafeAt(b, v)'
+  (*
+  <2>1. \A a_1 \in Acceptor, b_1 \in Ballot, v_1 \in Value:
+        VotedFor(a_1, b_1, v_1) => VotedFor(a_1, b_1, v_1)'
+    BY <1>1 DEFS VotedFor, IncreaseMaxBal
+  <2>2. \A a_1 \in Acceptor, b_1 \in Ballot:
+        DidNotVoteAt(a_1, b_1) => DidNotVoteAt(a_1, b_1)'
+    BY <1>1 DEFS IncreaseMaxBal, DidNotVoteAt, VotedFor
+  <2>3. \A a_1 \in Acceptor, b_1 \in Ballot:
+        maxBal[a_1] > b_1 => maxBal'[a_1] > b_1
+    BY <1>1 DEFS IncreaseMaxBal, Ballot, TypeOK
+  <2>4. \A a_1 \in Acceptor, b_1 \in Ballot:
+        CannotVoteAt(a_1, b_1) => CannotVoteAt(a_1, b_1)'
+    BY <2>2, <2>3 DEFS CannotVoteAt
+  <2>5. \A b_1 \in Ballot, v_1 \in Value:
+        NoneOtherChoosableAt(b_1, v_1) => NoneOtherChoosableAt(b_1, v_1)'
+    BY <2>1, <2>4, QuorumAssumption DEFS NoneOtherChoosableAt
+  <2>6. QED
+    BY <2>5 DEFS SafeAt, Ballot
+  *)
+  BY <1>1 DEFS SafeAt, NoneOtherChoosableAt, CannotVoteAt, DidNotVoteAt, 
+            VotedFor, IncreaseMaxBal, Ballot, TypeOK
+<1>2. ASSUME NEW aa \in Acceptor, NEW bb \in Ballot, NEW vv \in Value,
+             VoteFor(aa, bb, vv)
+      PROVE  SafeAt(b, v)'
+   BY <1>2 DEFS SafeAt, NoneOtherChoosableAt, CannotVoteAt, DidNotVoteAt, 
+            VotedFor, VoteFor, Ballot, TypeOK
+<1>3. QED
+  BY <1>1, <1>2 DEFS Next
+                               
 -----------------------------------------------------------------------------
 THEOREM Invariant == Spec => []Inv
 <1> USE DEF Inv
